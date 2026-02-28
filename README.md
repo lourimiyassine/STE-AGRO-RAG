@@ -4,6 +4,7 @@
 Un module **RAG (Retrieval-Augmented Generation)** de recherche sémantique de niveau production pour une base de données d'ingrédients de boulangerie. Extrait le texte de fiches techniques PDF, génère des embeddings, et permet la recherche en langage naturel sur les spécifications d'ingrédients.
 
 ---
+## Vidéo Demo
 
 ## ✅ Conformité Challenge
 
@@ -245,3 +246,4 @@ Score : 0.82
 ## 📄 Licence
 
 Développé pour le Challenge RAG — Plateforme d'Intelligence Boulangerie & Pâtisserie.
+
