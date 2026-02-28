@@ -6,6 +6,10 @@ Un module **RAG (Retrieval-Augmented Generation)** de recherche sémantique de n
 ---
 ## Vidéo Demo
 
+
+https://github.com/user-attachments/assets/2d6f9aed-263b-4939-8567-ea354429ca29
+
+
 ## ✅ Conformité Challenge
 
 | Contrainte imposée | Implémentation | Statut |
@@ -246,4 +250,5 @@ Score : 0.82
 ## 📄 Licence
 
 Développé pour le Challenge RAG — Plateforme d'Intelligence Boulangerie & Pâtisserie.
+
 
