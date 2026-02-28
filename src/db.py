@@ -217,13 +217,17 @@ def search_similar(
         # ORDER BY distance ASC = ORDER BY similarity DESC
         cur.execute(
             """
-            SELECT
-                id,
-                id_document,
-                texte_fragment,
-                1 - (vecteur <=> %s::vector) AS similarity_score
-            FROM embeddings
-            ORDER BY vecteur <=> %s::vector ASC
+            SELECT id, id_document, texte_fragment, similarity_score
+            FROM (
+                SELECT DISTINCT ON (texte_fragment)
+                    id,
+                    id_document,
+                    texte_fragment,
+                    1 - (vecteur <=> %s::vector) AS similarity_score
+                FROM embeddings
+                ORDER BY texte_fragment, vecteur <=> %s::vector ASC
+            ) AS unique_results
+            ORDER BY similarity_score DESC
             LIMIT %s
             """,
             (vector_str, vector_str, top_k)

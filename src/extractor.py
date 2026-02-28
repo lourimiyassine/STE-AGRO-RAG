@@ -34,7 +34,9 @@ def clean_text(text: str) -> str:
         - Remove control characters (keep newlines and tabs)
         - Normalize Unicode (NFC form for French accents)
         - Remove page number patterns (Page 3, - 3 -, 3/10, etc.)
-        - Remove repeated header/footer artifacts
+        - Remove company header/footer boilerplate (addresses, phone, email, URLs)
+        - Remove "TECHNICAL DATA SHEET" and branding lines
+        - Remove revision/date/version metadata lines
         - Collapse multiple whitespace into single space
         - Collapse multiple newlines into double newline (paragraph break)
         - Strip leading/trailing whitespace
@@ -48,7 +50,38 @@ def clean_text(text: str) -> str:
     # Remove control characters except newline (\n), tab (\t), carriage return (\r)
     text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]', '', text)
 
-    # Remove page number patterns:
+    # ── Company header/footer noise removal ──────────────────────
+
+    # Remove "VTR&beyond" or "VTR & beyond" branding lines
+    text = re.sub(r'(?im)^.*VTR\s*&\s*beyond.*$', '', text)
+
+    # Remove full address blocks (No.8 Pingbei, Nanping, Zhuhai, Stresemann, Berlin, etc.)
+    text = re.sub(r'(?im)^.*(?:Pingbei|Nanping|Zhuhai|Guangdong|Stresemann|10963\s*Berlin).*$', '', text)
+    text = re.sub(r'(?im)^.*Science and Technolog\s*y Industry.*$', '', text)
+    text = re.sub(r'(?im)^.*Zone,\s*Nanping.*$', '', text)
+
+    # Remove phone/fax/tel lines
+    text = re.sub(r'(?im)^.*(?:Tel|Fax|Phone)\s*[:.].*$', '', text)
+
+    # Remove email lines (Mail: ... or standalone emails)
+    text = re.sub(r'(?im)^.*Mail\s*[:.].*$', '', text)
+    text = re.sub(r'(?im)^.*\b[\w.-]+@[\w.-]+\.\w+\b.*$', '', text)
+
+    # Remove website lines
+    text = re.sub(r'(?im)^.*Website\s*[:.].*$', '', text)
+    text = re.sub(r'(?im)^.*(?:www\.[\w.-]+\.\w+|https?://[\w.-]+).*$', '', text)
+
+    # Remove "TECHNICAL DATA SHEET" header
+    text = re.sub(r'(?im)^.*TECHNICAL\s+DATA\s+SHEET.*$', '', text)
+
+    # Remove revision/version/date metadata lines
+    text = re.sub(r'(?im)^.*(?:Revision|Rev\.|Version|Date of issue|Effective date)\s*[:.].*\d{2,4}.*$', '', text)
+
+    # Remove "No." followed by just a number and comma/period on a line (address fragments)
+    text = re.sub(r'(?im)^No\.\s*\d+.*$', '', text)
+
+    # ── Page number patterns ─────────────────────────────────────
+
     # "Page 3", "page 3", "PAGE 3"
     text = re.sub(r'(?i)\bpage\s+\d+\b', '', text)
     # "- 3 -", "— 3 —"
@@ -58,8 +91,11 @@ def clean_text(text: str) -> str:
     # Standalone page numbers at line start/end
     text = re.sub(r'(?m)^\s*\d{1,3}\s*$', '', text)
 
-    # Remove common header/footer artifacts
+    # ── General header/footer artifacts ──────────────────────────
+
     text = re.sub(r'(?i)(confidential|proprietary|all rights reserved|©.*?\d{4})', '', text)
+
+    # ── Whitespace normalization ─────────────────────────────────
 
     # Collapse multiple spaces into single space
     text = re.sub(r'[ \t]+', ' ', text)
@@ -67,8 +103,9 @@ def clean_text(text: str) -> str:
     # Collapse 3+ newlines into double newline (preserve paragraph breaks)
     text = re.sub(r'\n{3,}', '\n\n', text)
 
-    # Strip each line
+    # Strip each line and remove empty lines
     lines = [line.strip() for line in text.split('\n')]
+    lines = [line for line in lines if line]  # Remove empty lines
     text = '\n'.join(lines)
 
     # Final strip

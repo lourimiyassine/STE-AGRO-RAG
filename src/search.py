@@ -121,7 +121,7 @@ def format_results(results: List[Dict]) -> str:
         part = (
             f"Résultat {result['rank']}\n"
             f"Texte : \"{fragment_display}\"\n"
-            f"Score : {result['score']:.2f}"
+            f"Score : {result['score']:.4f}"
         )
         output_parts.append(part)
 
